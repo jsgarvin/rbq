@@ -5,3 +5,4 @@ also make sure that multiple tracks by the same artist are sufficietly spread ap
 
 * Only songs that have been given at least one star will be chosen.
 * Songs that have "never" been played have highest chance of selection.
+* Don't run while Rhythmbox is running. Shut down Rhythmbox first, run RBQ, then restart Rhythmbox.
