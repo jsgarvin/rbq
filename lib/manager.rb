@@ -1,23 +1,25 @@
 module RBQ
   class Manager
-    attr_reader :library, :playlist
+    include Singleton
+    class << self
+      attr_reader :playlist
     
-    def initialize(path)
-      @library = Library.new(path)
-      @playlist = Playlist.new(path)
-    end
-    
-    def build_new_queue
-      playlist.clear
-      while playlist.hours < 8 and library.total_weight > 0
-        new_song = library.pick_a_song
-        unless playlist.songs.include?(new_song)
-          playlist.add_songs(new_song)
-        end
+      def set_path(path)
+        Library.setup(path)
+        Playlist.setup(path)
       end
-      playlist.spread(25)
-      playlist.save
+      
+      def build_new_queue
+        Playlist.clear
+        while Playlist.hours < 8 and Library.total_weight > 0
+          new_song = Library.pick_a_song
+          unless Playlist.songs.include?(new_song)
+            Playlist.add_songs(new_song)
+          end
+        end
+        Playlist.spread(25)
+        Playlist.save
+      end
     end
-    
   end
 end
