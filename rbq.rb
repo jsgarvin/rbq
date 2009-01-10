@@ -1,8 +1,9 @@
 require 'rexml/document'
+require 'singleton'
 require 'lib/manager'
 require 'lib/playlist'
 require 'lib/library'
 require 'lib/song'
 
-manager = RBQ::Manager.new('~/.gnome2/rhythmbox')
-manager.build_new_queue
+RBQ::Manager.set_path('~/.gnome2/rhythmbox')
+RBQ::Manager.build_new_queue
