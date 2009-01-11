@@ -16,9 +16,7 @@ module RBQ
       def filename; @filename ||= 'playlists.xml'; end
       
       def clear
-        queue.elements.each do |el|
-          queue.delete_element(el)
-        end
+        queue.elements.delete_all('location')
       end
       
       def queue
@@ -29,7 +27,7 @@ module RBQ
         songs.each do |song|
           queue.add_element song.location_element
         end
-        File.open(File.expand_path("#{path}/playlists.xml"),'w') {|out| out << xml_doc.to_s }  
+        File.open(File.expand_path("#{path}/#{filename}"),'w') {|out| out << xml_doc.to_s }  
       end
       
       def songs(range = nil)

@@ -15,9 +15,11 @@ module RBQ
     end
 
     def method_missing(method_name, *args)
-      seeking_raw_element = false
-      if method_name.to_s.match(/([^_]+)_element/)
+      seeking_raw_element = false; doing_assignment = false
+      if method_name.to_s.match(/(.+)_element$/)
         ivar = $1; seeking_raw_element = true
+      elsif method_name.to_s.match(/(.+)=$/)
+        ivar = $1; doing_assignment = true
       else
         ivar = method_name.to_s; 
       end
@@ -25,11 +27,18 @@ module RBQ
       return element.elements[key.to_s] if seeking_raw_element
       return instance_variable_get("@#{ivar}") if instance_variable_defined?("@#{ivar}")
       if element.elements[key.to_s]
-        instance_variable_set("@#{ivar}", case
-          when INTEGERIZE_FIELDS.include?(key) then element.elements[key.to_s].text.to_i
-          when TIMEIFY_FIELDS.include?(key) then Time.at(element.elements[key.to_s].text.to_i)
-          else element.elements[key.to_s].text
-        end)
+        if doing_assignment
+          instance_variable_set("@#{ivar}", case
+            when TIMEIFY_FIELDS.include?(key) then element.elements[key.to_s].text= args[0].to_i
+            else element.elements[key.to_s].text= args[0]
+          end)
+        else
+          instance_variable_set("@#{ivar}", case
+            when INTEGERIZE_FIELDS.include?(key) then element.elements[key.to_s].text.to_i
+            when TIMEIFY_FIELDS.include?(key) then Time.at(element.elements[key.to_s].text.to_i)
+            else element.elements[key.to_s].text
+          end)
+        end
       else
         super
       end

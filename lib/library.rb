@@ -42,6 +42,24 @@ module RBQ
         end
       end
       
+      def reset_all_history(first_seen = Time.now)
+        backup_xml_file
+        songs.each do |song|
+          song.last_played = 0
+          song.first_seen = first_seen
+          song.play_count = 0
+        end
+        save
+      end
+      
+      def save
+        xml_doc.root.elements.delete_all("entry[@type='song']")
+        songs.each do |song|
+          xml_doc.root.add_element song.element
+        end
+        File.open(File.expand_path("#{path}/#{filename}"),'w') {|out| out << xml_doc.to_s } 
+      end
+      
     end
   end
 end
