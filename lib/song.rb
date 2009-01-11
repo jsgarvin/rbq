@@ -18,11 +18,23 @@ module RBQ
     end
     
     def weight
-      @weight ||= seconds_since_played_or_seen * rating.to_i
+      @weight ||= (seconds_since_seen/(play_count+1)) * rating
     end
     
-    def seconds_since_played_or_seen
-      (Time.now - (last_played > first_seen ? last_played : first_seen))
+    def play_count=(c)
+      @play_count = c.to_i
+    end
+    
+    def duration=(d)
+      @duration = d.to_i
+    end
+    
+    def rating=(r)
+      @rating = r.to_i
+    end
+    
+    def seconds_since_seen
+      (Time.now - first_seen).to_i 
     end
     
     def to_e

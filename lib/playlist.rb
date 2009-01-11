@@ -43,7 +43,7 @@ module RBQ
       end
       
       def hours
-        (songs.inject(0) {|seconds,song| seconds + song.duration.to_i }).to_f/3600
+        (songs.inject(0) {|seconds,song| seconds + song.duration }).to_f/3600
       end
       
       #spreads apart different tracks by the same artist so that
