@@ -49,6 +49,8 @@ module RBQ
       #spreads apart different tracks by the same artist so that
       #they have at least 'distance' other tracks between them
       def spread(distance, spread_counter = 0)
+        $stdout.sync = true
+        print spread_counter == 0 ? 'Spreading: ' : ':'
         had_to_spread = false
         songs.each do |song|
           sindex = songs.index(song)
@@ -60,12 +62,15 @@ module RBQ
               s = songs.delete_at(sindex)
               songs.insert(sindex+1,s)
               had_to_spread = true
+              print '.'
             else
               s = songs.delete_at(sindex)
+              print '-'
             end
           end
         end
         spread(distance, spread_counter+1) if had_to_spread and spread_counter <= distance * 2
+        puts if spread_counter == 0
       end
       
       def artists(range = nil)

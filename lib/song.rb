@@ -1,7 +1,7 @@
 module RBQ
   class Song
     include REXML
-    attr_accessor :title, :artist, :duration, :location, :rating, :play_count, :last_played, :weight
+    attr_accessor :title, :artist, :duration, :location, :rating, :play_count, :last_played, :first_seen, :weight
     
     def initialize(attrs = {})
       attrs.keys.each do |key|
@@ -13,12 +13,16 @@ module RBQ
       @last_played = t.is_a?(Time) ? t : Time.at(t.to_i)
     end
     
-    def weight
-      @weight ||= seconds_ago_played * rating.to_i
+    def first_seen=(t)
+      @first_seen = t.is_a?(Time) ? t : Time.at(t.to_i)
     end
     
-    def seconds_ago_played
-      (Time.now - last_played)
+    def weight
+      @weight ||= seconds_since_played_or_seen * rating.to_i
+    end
+    
+    def seconds_since_played_or_seen
+      (Time.now - (last_played > first_seen ? last_played : first_seen))
     end
     
     def to_e

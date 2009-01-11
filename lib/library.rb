@@ -21,7 +21,8 @@ module RBQ
             :location => get_element_value(el,:location),
             :rating => get_element_value(el,:rating),
             :play_count => get_element_value(el,'play-count'),
-            :last_played => get_element_value(el,'last-played')
+            :last_played => get_element_value(el,'last-played'),
+            :first_seen => get_element_value(el,'first-seen')
           )
           counter += 1
           print "\rLoading Library: #{((counter.to_f/total)*100).to_i}%"
