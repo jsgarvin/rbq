@@ -27,7 +27,7 @@ module RBQ
       
       def save
         songs.each do |song|
-          queue.add_element song.to_e
+          queue.add_element song.location_element
         end
         File.open(File.expand_path("#{path}/playlists.xml"),'w') {|out| out << xml_doc.to_s }  
       end

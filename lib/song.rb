@@ -3,46 +3,45 @@ require 'rexml/document'
 module RBQ
   class Song
     include REXML
-    attr_accessor :title, :artist, :duration, :location, :rating, :play_count, :last_played, :first_seen, :weight
+    attr_accessor :element, :weight
+    INTEGERIZE_FIELDS = ['duration', 'rating', 'play-count']
+    TIMEIFY_FIELDS = ['last-played', 'first-seen']
     
-    def initialize(attrs = {})
-      attrs.keys.each do |key|
-        self.send("#{key}=",attrs[key])
+    def initialize(element)
+      @element = element
+      ['title', 'artist', 'duration', 'location', 'rating', 'play-count', 'last-played', 'first-seen'].each do |field_name|
+        @element.add_element Element.new(field_name).add_text('0') unless element.elements[field_name]
       end
     end
-    
-    def last_played=(t)
-      @last_played = t.is_a?(Time) ? t : Time.at(t.to_i)
-    end
-    
-    def first_seen=(t)
-      @first_seen = t.is_a?(Time) ? t : Time.at(t.to_i)
+
+    def method_missing(method_name, *args)
+      seeking_raw_element = false
+      if method_name.to_s.match(/([^_]+)_element/)
+        ivar = $1; seeking_raw_element = true
+      else
+        ivar = method_name.to_s; 
+      end
+      key = ivar.gsub(/\_/,'-')
+      return element.elements[key.to_s] if seeking_raw_element
+      return instance_variable_get("@#{ivar}") if instance_variable_defined?("@#{ivar}")
+      if element.elements[key.to_s]
+        instance_variable_set("@#{ivar}", case
+          when INTEGERIZE_FIELDS.include?(key) then element.elements[key.to_s].text.to_i
+          when TIMEIFY_FIELDS.include?(key) then Time.at(element.elements[key.to_s].text.to_i)
+          else element.elements[key.to_s].text
+        end)
+      else
+        super
+      end
     end
     
     def weight
       @weight ||= (seconds_since_seen/(play_count+1)) * rating
     end
     
-    def play_count=(c)
-      @play_count = c.to_i
-    end
-    
-    def duration=(d)
-      @duration = d.to_i
-    end
-    
-    def rating=(r)
-      @rating = r.to_i
-    end
-    
     def seconds_since_seen
       (Time.now - first_seen).to_i 
     end
     
-    def to_e
-      e = Element.new('location')
-      e.add_text self.location
-      return e
-    end
   end
 end
