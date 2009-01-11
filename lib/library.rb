@@ -1,19 +1,26 @@
+require 'rexml/document'
+require 'singleton'
+require 'ftools'
+require 'lib/song'
+
 module RBQ
   class Library
     include Singleton
     
     class << self
       include REXML
-      attr_reader :songs
-    
-      def setup(path)
-        @path = path
+      attr_reader :songs, :xml_doc
+      attr_accessor :path, :filename
+      
+      def path; @path ||= '~/.gnome2/rhythmbox'; end
+      def filename; @filename = 'rhythmdb.xml'; end
+      
+      def load
         @songs = []
         $stdout.sync = true
-        doc = new_document('rhythmdb.xml')
         counter = 0
-        total = doc.root.get_elements("entry[@type='song']").size
-        doc.root.each_element_with_attribute('type', 'song') do |el|
+        total = xml_doc.root.get_elements("entry[@type='song']").size
+        xml_doc.root.each_element_with_attribute('type', 'song') do |el|
           @songs << Song.new(
             :title => get_element_value(el,:title),
             :artist => get_element_value(el,:artist),
@@ -43,16 +50,32 @@ module RBQ
         end
       end
       
+      def backup_xml_file
+        File.copy(expanded_path_to_file, expanded_path_to_file+".#{Time.now.to_i.to_s}.bkp")
+      end
+      
+      def xml_file_exists?
+        File.exists?(expanded_path_to_file)
+      end
+      
       #######
       private
       #######
-      def new_document(filename)
-        Document.new(File.new(File.expand_path("#{@path}/#{filename}")))
+      
+      def expanded_path_to_file
+        @expanded_path_to_file ||= File.expand_path("#{path}/#{filename}")
       end
       
       def get_element_value(element,key)
         element.elements[key.to_s] ? element.elements[key.to_s].text : nil
       end
+      
+      def xml_doc
+        raise XmlFileNotFoundError unless xml_file_exists?
+        @xml_doc ||= Document.new(File.new(expanded_path_to_file))
+      end
     end
   end
 end
+
+class XmlFileNotFoundError < RuntimeError; end

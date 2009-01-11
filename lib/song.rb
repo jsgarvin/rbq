@@ -1,3 +1,5 @@
+require 'rexml/document'
+
 module RBQ
   class Song
     include REXML

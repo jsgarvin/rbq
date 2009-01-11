@@ -1,16 +1,20 @@
+require 'singleton'
+require 'lib/playlist'
+require 'lib/library'
+
 module RBQ
   class Manager
     include Singleton
     class << self
-      attr_reader :playlist
     
       def set_path(path)
-        Library.setup(path)
+        Library.path = path
         Playlist.setup(path)
       end
       
       def build_new_queue
         $stdout.sync = true
+        Library.load
         Playlist.clear
         while Playlist.hours < 8 and Library.total_weight > 0
           new_song = Library.pick_a_song

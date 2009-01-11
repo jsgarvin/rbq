@@ -1,3 +1,6 @@
+require 'rexml/document'
+require 'singleton'
+
 module RBQ
   class Playlist
     include Singleton
