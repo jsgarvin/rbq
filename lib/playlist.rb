@@ -1,18 +1,19 @@
 require 'rexml/document'
 require 'singleton'
+require 'lib/library'
+require 'lib/common'
 
 module RBQ
   class Playlist
     include Singleton
     
     class << self
-      include REXML
-      attr_reader :doc, :path
-        
-      def setup(path)
-        @path = path
-        @doc = new_document('playlists.xml')
-      end
+      include SharedLibraryPlaylistMethods
+      attr_accessor :filename
+      
+      def path=(p); Library.path = path; end
+      def path; Library.path; end
+      def filename; @filename ||= 'playlists.xml'; end
       
       def clear
         queue.elements.each do |el|
@@ -21,14 +22,14 @@ module RBQ
       end
       
       def queue
-        doc.root.elements["playlist[@type='queue']"]
+        xml_doc.root.elements["playlist[@type='queue']"]
       end
       
       def save
         songs.each do |song|
           queue.add_element song.to_e
         end
-        File.open(File.expand_path("#{path}/playlists.xml"),'w') {|out| out << doc.to_s }  
+        File.open(File.expand_path("#{path}/playlists.xml"),'w') {|out| out << xml_doc.to_s }  
       end
       
       def songs(range = nil)
@@ -79,14 +80,7 @@ module RBQ
       def artists(range = nil)
         songs(range).inject([]){|artists,song| artists << song.artist }
       end
-      
-      #######
-      private
-      #######
-      
-      def new_document(filename)
-        Document.new(File.new(File.expand_path("#{path}/#{filename}")))
-      end
+     
     end
   end
 end

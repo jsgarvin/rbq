@@ -6,11 +6,6 @@ module RBQ
   class Manager
     include Singleton
     class << self
-    
-      def set_path(path)
-        Library.path = path
-        Playlist.setup(path)
-      end
       
       def build_new_queue
         $stdout.sync = true

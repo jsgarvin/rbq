@@ -2,18 +2,19 @@ require 'rexml/document'
 require 'singleton'
 require 'ftools'
 require 'lib/song'
+require 'lib/common'
 
 module RBQ
   class Library
     include Singleton
     
     class << self
-      include REXML
-      attr_reader :songs, :xml_doc
-      attr_accessor :path, :filename
+      include SharedLibraryPlaylistMethods
+      attr_reader :songs
+      attr_writer :path, :filename
       
       def path; @path ||= '~/.gnome2/rhythmbox'; end
-      def filename; @filename = 'rhythmdb.xml'; end
+      def filename; @filename ||= 'rhythmdb.xml'; end
       
       def load
         @songs = []
@@ -50,32 +51,13 @@ module RBQ
         end
       end
       
-      def backup_xml_file
-        File.copy(expanded_path_to_file, expanded_path_to_file+".#{Time.now.to_i.to_s}.bkp")
-      end
-      
-      def xml_file_exists?
-        File.exists?(expanded_path_to_file)
-      end
-      
       #######
       private
       #######
       
-      def expanded_path_to_file
-        @expanded_path_to_file ||= File.expand_path("#{path}/#{filename}")
-      end
-      
       def get_element_value(element,key)
         element.elements[key.to_s] ? element.elements[key.to_s].text : nil
-      end
-      
-      def xml_doc
-        raise XmlFileNotFoundError unless xml_file_exists?
-        @xml_doc ||= Document.new(File.new(expanded_path_to_file))
       end
     end
   end
 end
-
-class XmlFileNotFoundError < RuntimeError; end
