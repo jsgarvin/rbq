@@ -1,8 +1,8 @@
-RBQ is a simple Ruby script and populates a Rhythmbox "Play Queue" with a semi-random list of
+RBQ is a simple Ruby script that populates a Rhythmbox "Play Queue" with a semi-random list of
 songs from your library. Songs you've rated higher in Rhythmbox and songs that haven't been played
-in a while are more likely to get added than those rated lower or recently played. RBQ will
+much are more likely to get added than those rated lower or played more often. RBQ will
 also make sure that multiple tracks by the same artist are sufficietly spread apart in the queue.
 
 * Only songs that have been given at least one star will be chosen.
-* Songs that have "never" been played have highest chance of selection.
 * Don't run while Rhythmbox is running. Shut down Rhythmbox first, run RBQ, then restart Rhythmbox.
+	Otherwise, Rhythmbox will just overwrite any changes that RBQ makes.
