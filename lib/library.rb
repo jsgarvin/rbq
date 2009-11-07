@@ -13,7 +13,7 @@ module RBQ
       attr_reader :songs
       attr_writer :path, :filename
       
-      def path; @path ||= '~/.gnome2/rhythmbox'; end
+      def path; @path ||= '~/.local/share/rhythmbox'; end
       def filename; @filename ||= 'rhythmdb.xml'; end
       
       def load
