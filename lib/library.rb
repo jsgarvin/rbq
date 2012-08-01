@@ -1,21 +1,14 @@
-require 'rexml/document'
-require 'singleton'
-require 'ftools'
-require 'lib/song'
-require 'lib/common'
-
 module RBQ
   class Library
-    include Singleton
-    
+
     class << self
       include SharedLibraryPlaylistMethods
       attr_reader :songs
       attr_writer :path, :filename
-      
+
       def path; @path ||= '~/.local/share/rhythmbox'; end
       def filename; @filename ||= 'rhythmdb.xml'; end
-      
+
       def load
         @songs = []
         $stdout.sync = true
@@ -28,11 +21,11 @@ module RBQ
         end
         puts
       end
-    
+
       def total_weight
         songs.inject(0) {|total,song| total + song.weight }
       end
-      
+
       def pick_a_song
         target = rand(total_weight)
         counter = 0
@@ -41,7 +34,7 @@ module RBQ
           return song if counter >= target
         end
       end
-      
+
       def reset_all_history(first_seen = Time.now)
         backup_xml_file
         songs.each do |song|
@@ -51,15 +44,15 @@ module RBQ
         end
         save
       end
-      
+
       def save
         xml_doc.root.elements.delete_all("entry[@type='song']")
         songs.each do |song|
           xml_doc.root.add_element song.element
         end
-        File.open(File.expand_path("#{path}/#{filename}"),'w') {|out| out << xml_doc.to_s } 
+        File.open(File.expand_path("#{path}/#{filename}"),'w') {|out| out << xml_doc.to_s }
       end
-      
+
     end
   end
 end

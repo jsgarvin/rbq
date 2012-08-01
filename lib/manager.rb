@@ -1,12 +1,7 @@
-require 'singleton'
-require 'lib/playlist'
-require 'lib/library'
-
 module RBQ
   class Manager
-    include Singleton
     class << self
-      
+
       def build_new_queue
         $stdout.sync = true
         Library.load
